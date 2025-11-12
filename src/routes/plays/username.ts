@@ -1,4 +1,4 @@
-import { axios } from "~/lib/axios";
+import { AxiosInstance } from "axios";
 import { enforceArray } from "~/lib/helpers";
 
 import { ParamsPlaysUsername } from "~/routes/types/params";
@@ -90,6 +90,7 @@ const transformData = (
 };
 
 export const username = async (
+  axios: AxiosInstance,
   params: ParamsPlaysUsername,
 ): Promise<PayloadPlaysUsername> => {
   const { data } = await axios.get<ApiResponsePlaysUsername | ApiResponseError>(

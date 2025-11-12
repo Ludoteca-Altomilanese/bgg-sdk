@@ -1,4 +1,4 @@
-import { axios } from "~/lib/axios";
+import { AxiosInstance } from "axios";
 import { enforceArray } from "~/lib/helpers";
 
 import { ParamsUser } from "~/routes/types/params";
@@ -203,7 +203,10 @@ const transformData = (data: ApiResponse): PayloadUser => {
   };
 };
 
-export const user = async (params: ParamsUser): Promise<PayloadUser | null> => {
+export const user = async (
+  axios: AxiosInstance,
+  params: ParamsUser,
+): Promise<PayloadUser | null> => {
   // If the id provided is not a valid forum, BGG returns 200 with an html error page.
   // Catch xml parse error and return null.
 

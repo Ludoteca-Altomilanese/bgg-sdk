@@ -23,9 +23,14 @@ A modern SDK for interacting with the BoardGameGeek (BGG) XMLAPI2, written in Ty
 ## Code Example
 
 ```typescript
-import { bgg } from "bgg-sdk";
-// import bgg from "bgg-sdk";
+import BGG from "bgg-sdk";
 
+// Create a new BGG instance with bearer token (required)
+const bgg = new BGG({
+  bearerToken: "your-bearer-token-here"
+});
+
+// Use the instance to make API calls
 const results = await bgg.search({ query: "scythe" });
 
 // results
@@ -49,6 +54,31 @@ const results = await bgg.search({ query: "scythe" });
     ...
   ]
 }
+```
+
+### Custom Configuration
+
+You can customize the axios instance by passing configuration options to the BGG constructor:
+
+```typescript
+import BGG from "bgg-sdk";
+
+const bgg = new BGG({
+  bearerToken: "your-bearer-token-here", // Required: Bearer token for authentication
+  retries: 5, // Number of retry attempts (default: 3)
+  retryDelay: (retryCount) => retryCount * 1000, // Custom retry delay function
+  axiosConfig: {
+    baseURL: "https://boardgamegeek.com/xmlapi2/", // Custom base URL
+    timeout: 10000, // Request timeout in ms
+    headers: {
+      "User-Agent": "MyApp/1.0",
+      // Note: Authorization header is automatically set with bearerToken
+    },
+    // Any other axios configuration options
+  },
+});
+
+const results = await bgg.search({ query: "scythe" });
 ```
 
 ## Contributing

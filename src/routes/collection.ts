@@ -1,4 +1,4 @@
-import { axios } from "~/lib/axios";
+import { AxiosInstance } from "axios";
 import { enforceArray } from "~/lib/helpers";
 
 import { ParamsCollection } from "~/routes/types/params";
@@ -106,6 +106,7 @@ const transformData = (data: ApiResponse): PayloadCollection => {
 };
 
 export const collection = async (
+  axios: AxiosInstance,
   params: ParamsCollection,
 ): Promise<PayloadCollection> => {
   const { data } = await axios.get<ApiResponse>("/collection", {

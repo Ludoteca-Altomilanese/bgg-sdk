@@ -1,4 +1,4 @@
-import { axios } from "~/lib/axios";
+import { AxiosInstance } from "axios";
 import { enforceArray } from "~/lib/helpers";
 
 import { ParamsGuild } from "~/routes/types/params";
@@ -90,7 +90,10 @@ const transformData = (data: ApiResponse): PayloadGuild => {
   };
 };
 
-export const guild = async (params: ParamsGuild): Promise<PayloadGuild> => {
+export const guild = async (
+  axios: AxiosInstance,
+  params: ParamsGuild,
+): Promise<PayloadGuild> => {
   const { data } = await axios.get<ApiResponse>("/guild", {
     params,
   });

@@ -1,4 +1,4 @@
-import { axios } from "~/lib/axios";
+import { AxiosInstance } from "axios";
 import { enforceArray } from "~/lib/helpers";
 
 import { ParamsForum } from "~/routes/types/params";
@@ -52,7 +52,10 @@ const transformData = (data: ApiResponse): PayloadForum => {
   };
 };
 
-export const forum = async (params: ParamsForum): Promise<PayloadForum> => {
+export const forum = async (
+  axios: AxiosInstance,
+  params: ParamsForum,
+): Promise<PayloadForum> => {
   // If the id provided is not a valid forum, BGG returns 200 with an html error page.
   // Catch xml parse error and return null.
 

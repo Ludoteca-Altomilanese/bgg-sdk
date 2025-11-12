@@ -1,4 +1,4 @@
-import { axios } from "~/lib/axios";
+import { AxiosInstance } from "axios";
 import { enforceArray } from "~/lib/helpers";
 
 import { ParamsSearch } from "~/routes/types/params";
@@ -46,7 +46,10 @@ const transformData = (data: ApiResponse): PayloadSearch => {
   };
 };
 
-export const search = async (args: ParamsSearch): Promise<PayloadSearch> => {
+export const search = async (
+  axios: AxiosInstance,
+  args: ParamsSearch,
+): Promise<PayloadSearch> => {
   const params = transformParams(args);
   const { data } = await axios.get<ApiResponse>(endpoint, { params });
 

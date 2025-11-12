@@ -1,4 +1,4 @@
-import { axios } from "~/lib/axios";
+import { AxiosInstance } from "axios";
 import { enforceArray } from "~/lib/helpers";
 
 import { ParamsForumList } from "~/routes/types/params";
@@ -48,6 +48,7 @@ const transformData = (data: ApiResponse): PayloadForumList => {
 };
 
 export const forumList = async (
+  axios: AxiosInstance,
   params: ParamsForumList,
 ): Promise<PayloadForumList> => {
   const { data } = await axios.get<ApiResponse>("/forumlist", {

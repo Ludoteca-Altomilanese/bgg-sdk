@@ -1,4 +1,4 @@
-import { axios } from "~/lib/axios";
+import { AxiosInstance } from "axios";
 import { enforceArray } from "~/lib/helpers";
 
 import { ParamsFamily } from "~/routes/types/params";
@@ -87,7 +87,10 @@ const transformData = (data: ApiResponse): PayloadFamily => {
   };
 };
 
-export const family = async (params: ParamsFamily): Promise<PayloadFamily> => {
+export const family = async (
+  axios: AxiosInstance,
+  params: ParamsFamily,
+): Promise<PayloadFamily> => {
   const { data } = await axios.get<ApiResponse>("/family", {
     params: transformParams(params),
   });
