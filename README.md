@@ -1,7 +1,6 @@
 # bgg-sdk
 
-[![NPM Version](https://img.shields.io/npm/v/bgg-sdk?&logo=npm)](https://www.npmjs.com/package/bgg-sdk)
-[![NPM Version](https://img.shields.io/badge/coverage-100%25-green)](https://github.com/ColCross/bgg-sdk/tree/main/tests)
+[![GitHub Package](https://img.shields.io/badge/GitHub-Package-blue?logo=github)](https://github.com/Ludoteca-Altomilanese/bgg-sdk/packages)
 
 A modern SDK for interacting with the BoardGameGeek (BGG) XMLAPI2, written in TypeScript and inspired by [BGG](https://www.npmjs.com/package/bgg).
 
@@ -13,21 +12,32 @@ A modern SDK for interacting with the BoardGameGeek (BGG) XMLAPI2, written in Ty
 - Full type safety for requests and responses
 - Support for both CommonJS and ES modules
 - Usable in both server and browser environments
+- Bearer token authentication
 
 ## Quickstart
 
+### Installation
+
+1. Configure npm to use GitHub Package Registry. Create or edit `.npmrc` in your project root:
+
 ```bash
-    npm install bgg-sdk
+@ludoteca-altomilanese:registry=https://npm.pkg.github.com
+```
+
+2. Install the package:
+
+```bash
+npm install @ludoteca-altomilanese/bgg-sdk
 ```
 
 ## Code Example
 
 ```typescript
-import BGG from "bgg-sdk";
+import BGG from "@ludoteca-altomilanese/bgg-sdk";
 
 // Create a new BGG instance with bearer token (required)
 const bgg = new BGG({
-  bearerToken: "your-bearer-token-here"
+  bearerToken: "your-bearer-token-here",
 });
 
 // Use the instance to make API calls
@@ -61,7 +71,7 @@ const results = await bgg.search({ query: "scythe" });
 You can customize the axios instance by passing configuration options to the BGG constructor:
 
 ```typescript
-import BGG from "bgg-sdk";
+import BGG from "@ludoteca-altomilanese/bgg-sdk";
 
 const bgg = new BGG({
   bearerToken: "your-bearer-token-here", // Required: Bearer token for authentication
@@ -85,7 +95,7 @@ const results = await bgg.search({ query: "scythe" });
 
 Hey there! 👋
 
-I hope you've found my sdk useful for your project, but if you found any bugs please open an issue and I'll address it as soon as I can.
+I hope you've found this SDK useful for your project, but if you found any bugs please open an issue and we'll address it as soon as we can.
 
 Of course always feel free to take a crack at fixing it yourself and opening a PR!
 
@@ -94,8 +104,10 @@ Of course always feel free to take a crack at fixing it yourself and opening a P
 1. **Fork the repo** and clone it to your machine.
 2. **Install dependencies** with `npm install`.
 3. **Make your changes** in a new branch.
-4. **Test your changes** to make sure everything works as expected.
-   1. Run `npm test` and fix / add any necessary tests to maintain 100% code coverage. _Your PR cannot be merged until all tests pass._
+4. **Build and test your changes** to make sure everything works as expected.
+   1. Run `npm run build` to ensure the build succeeds.
+   2. Run `npm test` to run the test suite.
+   3. Run `npm run lint` to check for linting issues.
 5. **Submit a pull request** with a clear description of your changes.
 
 ## Future Plans

@@ -1,109 +1,87 @@
+import BGG from "~/index";
 import MockAdapter from "axios-mock-adapter";
-import { axios } from "~/lib/axios";
 
-import {
-  ParamsTransformed,
-  endpoint,
-  transformParams,
-  search,
-} from "~/routes/search";
-import { ParamsSearch } from "~/routes/types/params";
-import { PayloadSearch } from "~/routes/types/payloads";
+describe("search route", () => {
+  let bgg: BGG;
+  let mock: MockAdapter;
 
-const mock = new MockAdapter(axios);
-
-describe("search", () => {
-  it("should make a search query with results and transform them", async () => {
-    const mockApiResponse = `
-        <?xml version="1.0" encoding="utf-8"?>
-        <items total="76" termsofuse="https://boardgamegeek.com/xmlapi/termsofuse">
-            <item type="boardgame" id="398158">
-                <name type="primary" value="Grind House: Scythes Out"/>
-                <yearpublished value="2023" />
-            </item>
-            <item type="boardgame" id="226320">
-                <name type="primary" value="My Little Scythe"/>
-                <yearpublished value="2017" />
-            </item>
-            <item type="videogame" id="251883">
-                <name type="primary" value="Scythe: Digital Edition"/>
-            </item>
-        </items>
-    `;
-
-    const params: ParamsSearch = { query: "scythe" };
-
-    mock
-      .onGet(endpoint, { params: transformParams(params) })
-      .replyOnce(200, mockApiResponse);
-
-    const result = await search(params);
-
-    const mockPayload: PayloadSearch = {
-      attributes: {
-        termsofuse: "https://boardgamegeek.com/xmlapi/termsofuse",
-      },
-      items: [
-        {
-          id: "398158",
-          type: "boardgame",
-          name: "Grind House: Scythes Out",
-          yearPublished: "2023",
-        },
-        {
-          id: "226320",
-          type: "boardgame",
-          name: "My Little Scythe",
-          yearPublished: "2017",
-        },
-        {
-          id: "251883",
-          type: "videogame",
-          name: "Scythe: Digital Edition",
-        },
-      ],
-    };
-
-    expect(result).toEqual(mockPayload);
+  beforeEach(() => {
+    bgg = new BGG({ bearerToken: "test-token" });
+    // @ts-expect-error - Accessing private property for testing
+    mock = new MockAdapter(bgg.axios);
   });
 
-  it("should make a search query with no results and handle it", async () => {
-    const mockApiResponse = `
-        <?xml version="1.0" encoding="utf-8"?>
-        <items total="0" termsofuse="https://boardgamegeek.com/xmlapi/termsofuse">							</items>
-    `;
-
-    const params: ParamsSearch = { query: "abcdefg" };
-
-    mock
-      .onGet(endpoint, { params: transformParams(params) })
-      .replyOnce(200, mockApiResponse);
-
-    const result = await search(params);
-
-    const mockPayload: PayloadSearch = {
-      attributes: {
-        termsofuse: "https://boardgamegeek.com/xmlapi/termsofuse",
-      },
-      items: [],
-    };
-
-    expect(result).toEqual(mockPayload);
+  afterEach(() => {
+    mock.restore();
   });
 
-  it("should transform raw params", async () => {
-    const rawParams: ParamsSearch = {
-      query: "scythe",
-      type: ["videogame", "boardgameexpansion"],
-    };
+  it("should search for games and return results", async () => {
+    const mockApiResponse = `
+      <?xml version="1.0" encoding="utf-8"?>
+      <items total="3" termsofuse="https://boardgamegeek.com/xmlapi/termsofuse">
+        <item type="boardgame" id="398158">
+          <name type="primary" value="Grind House: Scythes Out"/>
+          <yearpublished value="2023" />
+        </item>
+        <item type="boardgame" id="226320">
+          <name type="primary" value="My Little Scythe"/>
+          <yearpublished value="2017" />
+        </item>
+        <item type="videogame" id="251883">
+          <name type="primary" value="Scythe: Digital Edition"/>
+        </item>
+      </items>
+    `;
 
-    const transformedParams = transformParams(rawParams);
+    mock.onGet("/search").reply(200, mockApiResponse);
 
-    const expectedParams: ParamsTransformed = {
-      query: "scythe",
-      type: "videogame,boardgameexpansion",
-    };
+    const result = await bgg.search({ query: "scythe" });
 
-    expect(transformedParams).toEqual(expectedParams);
+    expect(result).toBeDefined();
+    expect(result.attributes.termsofuse).toBe(
+      "https://boardgamegeek.com/xmlapi/termsofuse",
+    );
+    expect(result.items).toHaveLength(3);
+    expect(result.items[0].name).toBe("Grind House: Scythes Out");
+    expect(result.items[0].yearPublished).toBe("2023");
+    expect(result.items[1].name).toBe("My Little Scythe");
+    expect(result.items[2].type).toBe("videogame");
+  });
+
+  it("should handle search with no results", async () => {
+    const mockApiResponse = `
+      <?xml version="1.0" encoding="utf-8"?>
+      <items total="0" termsofuse="https://boardgamegeek.com/xmlapi/termsofuse">
+      </items>
+    `;
+
+    mock.onGet("/search").reply(200, mockApiResponse);
+
+    const result = await bgg.search({ query: "nonexistentgame12345" });
+
+    expect(result).toBeDefined();
+    expect(result.items).toHaveLength(0);
+  });
+
+  it("should search with type filter", async () => {
+    const mockApiResponse = `
+      <?xml version="1.0" encoding="utf-8"?>
+      <items total="1" termsofuse="https://boardgamegeek.com/xmlapi/termsofuse">
+        <item type="boardgame" id="226320">
+          <name type="primary" value="My Little Scythe"/>
+          <yearpublished value="2017" />
+        </item>
+      </items>
+    `;
+
+    mock
+      .onGet("/search", { params: { query: "scythe", type: "boardgame" } })
+      .reply(200, mockApiResponse);
+
+    const result = await bgg.search({ query: "scythe", type: ["boardgame"] });
+
+    expect(result).toBeDefined();
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0].type).toBe("boardgame");
   });
 });
